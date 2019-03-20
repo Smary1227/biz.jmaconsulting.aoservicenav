@@ -4,6 +4,7 @@
   <div class="crm-section"><div class="label">{$form.child_last_name.1.label}</div> <div class="content">{$form.child_last_name.1.html}</div></div>
   <div class="crm-section"><div class="label">{$form.child_birth_date.1.label}</div> <div class="content">{$form.child_birth_date.1.html}</div></div>
   <div class="crm-section"><div class="label">{$form.child_gender.1.label}</div> <div class="content">{$form.child_gender.1.html}</div></div>
+  <div class="clear"></div>
   <div class="crm-section"><div class="label">{$form.child_is_registered.1.label}</div> <div class="content">{$form.child_is_registered.1.html}</div></div>
   <div class="clear"></div>
 </div>
@@ -16,6 +17,7 @@
       <div class="crm-section"><div class="label">{$form.child_last_name.$rowNumber.label}</div> <div class="content">{$form.child_last_name.$rowNumber.html}</div></div>
       <div class="crm-section"><div class="label">{$form.child_birth_date.$rowNumber.label}</div> <div class="content">{$form.child_birth_date.$rowNumber.html}</div></div>
       <div class="crm-section"><div class="label">{$form.child_gender.$rowNumber.label}</div> <div class="content">{$form.child_gender.$rowNumber.html}</div></div>
+      <div class="clear"></div>
       <div class="crm-section"><div class="label">{$form.child_is_registered.$rowNumber.label}</div> <div class="content">{$form.child_is_registered.$rowNumber.html}</div></div>
       <div class="crm-section"><div class="label"><a href=# class="remove_item crm-hover-button" title='Remove Child'><i class="crm-i fa-times"></i></a></div></div>
       <div class="clear"></div>
@@ -27,9 +29,9 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  $('#add-another-item').insertAfter($('#editrow-email-Primary'));
-  $('#children-with-asd').insertAfter($('#editrow-email-Primary'));
-  $('#first-child-asd').insertAfter($('#editrow-email-Primary'));
+  $('#add-another-item').insertAfter($('#editrow-postal_code-Primary'));
+  $('#children-with-asd').insertAfter($('#editrow-postal_code-Primary'));
+  $('#first-child-asd').insertAfter($('#editrow-postal_code-Primary'));
 
   var submittedRows = $.parseJSON('{/literal}{$childSubmitted}{literal}');
 

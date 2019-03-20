@@ -209,12 +209,12 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         $child['contact_id'] = $cid;
       }
       $childId = civicrm_api3('Contact', 'create', $child)['id'];
-      createRelationship($childId, $form->getVar('_id'), $childRel);
+      createServiceRelationship($childId, $form->getVar('_id'), $childRel);
     }
   }
 }
 
-function createRelationship($cida, $cidb, $type) {
+function createServiceRelationship($cida, $cidb, $type) {
   $relationshipParams = array(
     "contact_id_a" => $cida,
     "contact_id_b" => $cidb,
