@@ -1,6 +1,7 @@
 <?php
 define('SERVICENAV', 131);
 define('IS_REGISTERED', 'custom_774');
+define('DIAGNOSIS', 'custom_773');
 
 require_once 'aoservicenav.civix.php';
 
@@ -122,6 +123,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
 
     $submittedValues = [];
     $fields = [
+      'child_diagnosis' => ts("Child's Diagnosis"),
       'child_first_name' => ts("Child's First Name"),
       'child_last_name' => ts("Child's Last Name"),
       'child_birth_date' => ts("Child's Birth Date"),
@@ -144,6 +146,10 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
         elseif ($fieldName == "child_is_registered") {
           $options = CRM_Core_OptionGroup::values('is_your_child_registered_with_th_20190320085954');
           $form->addSelect($name, array('label' => $fieldLabel, 'allowClear' => FALSE, 'options' => $options));
+        }
+        elseif ($fieldName == "child_diagnosis") {
+          $childasd = CRM_Core_OptionGroup::values('child_asd_20190320203746');
+          $form->addCheckBox($name, $fieldLabel, array_flip($childasd));
         }
         else {
           $form->add('text', $name, $fieldLabel, NULL);
@@ -195,6 +201,13 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
       foreach ($params['child_is_registered'] as $key => $value) {
         if ($value) {
           $contactParams[$key][IS_REGISTERED] = $value;
+        }
+      }
+    }
+    if (!empty($params['child_diagnosis'])) {
+      foreach ($params['child_diagnosis'] as $key => $value) {
+        if ($value) {
+          $contactParams[$key][DIAGNOSIS] = $value;
         }
       }
     }

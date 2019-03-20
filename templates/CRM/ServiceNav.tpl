@@ -1,5 +1,6 @@
 <div id="first-child-asd">
   <fieldset><legend>Child 1</legend></fieldset>
+  <div class="crm-section"><div class="label">{$form.child_diagnosis.1.label}</div> <div class="content">{$form.child_diagnosis.1.html}</div></div>
   <div class="crm-section"><div class="label">{$form.child_first_name.1.label}</div> <div class="content">{$form.child_first_name.1.html}</div></div>
   <div class="crm-section"><div class="label">{$form.child_last_name.1.label}</div> <div class="content">{$form.child_last_name.1.html}</div></div>
   <div class="crm-section"><div class="label">{$form.child_birth_date.1.label}</div> <div class="content">{$form.child_birth_date.1.html}</div></div>
@@ -13,6 +14,7 @@
     {assign var='rowNumber' value=$smarty.section.i.index}
     <div id="add-item-row-{$rowNumber}" class="child-row hiddenElement">
       <fieldset><legend>Child {$rowNumber}</legend></fieldset>
+      <div class="crm-section"><div class="label">{$form.child_diagnosis.$rowNumber.label}</div> <div class="content">{$form.child_diagnosis.$rowNumber.html}</div></div>
       <div class="crm-section"><div class="label">{$form.child_first_name.$rowNumber.label}</div> <div class="content">{$form.child_first_name.$rowNumber.html}</div></div>
       <div class="crm-section"><div class="label">{$form.child_last_name.$rowNumber.label}</div> <div class="content">{$form.child_last_name.$rowNumber.html}</div></div>
       <div class="crm-section"><div class="label">{$form.child_birth_date.$rowNumber.label}</div> <div class="content">{$form.child_birth_date.$rowNumber.html}</div></div>
@@ -56,6 +58,7 @@ CRM.$(function($) {
     e.preventDefault();
     var row = $(this).closest('div.child-row');
     $('#add-another-item').show();
+    $('input[name^="child_diagnosis"]', row).prop('checked', false);
     $('input[id^="child_first_name"]', row).val('');
     $('input[id^="child_last_name"]', row).val('');
     $('input[id^="child_birth_date"]', row).next('input').next('a').trigger('click');
