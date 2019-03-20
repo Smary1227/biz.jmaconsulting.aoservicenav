@@ -215,7 +215,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
       civicrm_api3('Case', 'create', [
         'contact_id' => $contactID,
         'case_type_id' => "service_navigation",
-        'details' => "Service navigation for " . CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'sort_name', 'id'),
+        'details' => "Service navigation for " .  CRM_Contact_BAO_Contact::displayName($contactID),
         'subject' => "Service navigation",
         'start_date' => date('Ymd'),
         'status_id' => "Urgent",

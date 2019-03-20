@@ -47,7 +47,7 @@ CRM.$(function($) {
     if (hasHidden) {
       var row = $('#children-with-asd div.hiddenElement:first');
       $('div.hiddenElement:first, #children-with-asd').fadeIn("slow").removeClass('hiddenElement');
-      $('#add-another-item').toggle();
+      hasHidden = $('div.child-row').hasClass("hiddenElement");
     }
     $('#add-another-item').toggle(hasHidden);
   });
