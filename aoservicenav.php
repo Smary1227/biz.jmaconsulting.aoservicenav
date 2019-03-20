@@ -1,6 +1,6 @@
 <?php
-define('SERVICENAV', 15);
-define('IS_REGISTERED', 'custom_11');
+define('SERVICENAV', 131);
+define('IS_REGISTERED', 'custom_774');
 
 require_once 'aoservicenav.civix.php';
 
@@ -142,7 +142,8 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
           $form->addSelect($name, array('label' => $fieldLabel, 'allowClear' => TRUE, 'options' => $gender));
         }
         elseif ($fieldName == "child_is_registered") {
-          $form->addYesNo($name, $fieldLabel, TRUE);
+          $options = CRM_Core_OptionGroup::values('is_your_child_registered_with_th_20190320085954');
+          $form->addSelect($name, array('label' => $fieldLabel, 'allowClear' => FALSE, 'options' => $options));
         }
         else {
           $form->add('text', $name, $fieldLabel, NULL);
