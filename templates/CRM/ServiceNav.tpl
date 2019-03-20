@@ -43,13 +43,13 @@ CRM.$(function($) {
 
   $('#add-another-item').on('click', function(e) {
     e.preventDefault();
-    if ($('div.child-row').hasClass("hiddenElement")) {
+    var hasHidden = $('div.child-row').hasClass("hiddenElement");
+    if (hasHidden) {
       var row = $('#children-with-asd div.hiddenElement:first');
       $('div.hiddenElement:first, #children-with-asd').fadeIn("slow").removeClass('hiddenElement');
+      $('#add-another-item').toggle();
     }
-    else {
-      $('#add-another-item').hide();
-    }
+    $('#add-another-item').toggle(hasHidden);
   });
 
   $('.remove_item').on('click', function(e) {

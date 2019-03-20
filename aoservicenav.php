@@ -162,6 +162,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
 function aoservicenav_civicrm_postProcess($formName, &$form) {
   if ($formName == "CRM_Profile_Form_Edit" && $form->getVar('_gid') == SERVICENAV) {
     $params = $form->_submitValues;
+    $contactID = $form->getVar('_id');
     if (!empty($params['child_first_name'])) {
       foreach ($params['child_first_name'] as $key => $value) {
         if ($value) {
@@ -209,7 +210,16 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         $child['contact_id'] = $cid;
       }
       $childId = civicrm_api3('Contact', 'create', $child)['id'];
-      createServiceRelationship($childId, $form->getVar('_id'), $childRel);
+      createServiceRelationship($childId, $contactID, $childRel);
+
+      civicrm_api3('Case', 'create', [
+        'contact_id' => $contactID,
+        'case_type_id' => "service_navigation",
+        'details' => "Service navigation for " . CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'sort_name', 'id'),
+        'subject' => "Service navigation",
+        'start_date' => date('Ymd'),
+        'status_id' => "Urgent",
+      ]);
     }
   }
 }
