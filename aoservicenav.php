@@ -184,6 +184,20 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
     $params = $form->_submitValues;
     $contactID = $form->getVar('_id');
 
+    if (!empty($params['postal_code-Primary'])) {
+      list($chapter, $region, $service, $sub) = getServiceChapRegCodes($params['postal_code-Primary']);
+      if ($chapter || $region || $service || $sub) {
+        $cParams = [
+          'chapter' => $chapter,
+          'region' => $region,
+          'service_region' => $service,
+          'service_sub_region' => $sub,
+          'contact_id' => $contactID,
+        ];
+        setServiceChapRegCodes($cParams);
+      }
+    }
+
     // Check if contact present in Enews group.
     $groupContact = civicrm_api3('GroupContact', 'get', array(
       'sequential' => 1,
@@ -289,18 +303,9 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         civicrm_api3('Address', 'create', $address[$k]);
       }
 
-      if (!empty($params['postal_code-Primary'])) {
-        list($chapter, $region, $service, $sub) = getServiceChapRegCodes($params['postal_code-Primary']);
-        if ($chapter || $region) {
-          $cParams = [
-            'chapter' => $chapter,
-            'region' => $region,
-            'service_region' => $service,
-            'service_sub_region' => $sub,
-            'contact_id' => $childId,
-          ];
-          setServiceChapRegCodes($cParams);
-        }
+      if (!empty($cParams)) {
+        $cParams['contact_id'] = $childId;
+        setServiceChapRegCodes($cParams);
       }
 
       createServiceRelationship($childId, $contactID, $childRel);
