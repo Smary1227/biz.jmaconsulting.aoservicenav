@@ -215,7 +215,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
     foreach ($contactParams as $child) {
       $dedupeParams = CRM_Dedupe_Finder::formatParams($child, 'Individual');
       $dedupeParams['check_permission'] = FALSE;
-      $rule = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_dedupe_rule_group WHERE name = 'Child_Rule_8'");
+      $rule = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_dedupe_rule_group WHERE name = 'Child_Rule_10'");
       $dupes = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', NULL, array(), $rule);
       $cid = CRM_Utils_Array::value('0', $dupes, NULL);
       $child['contact_type'] = 'Individual';
