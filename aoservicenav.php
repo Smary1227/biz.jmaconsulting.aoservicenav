@@ -2,6 +2,7 @@
 define('SERVICENAV', 131);
 define('IS_REGISTERED', 'custom_774');
 define('DIAGNOSIS', 'custom_773');
+define('SERVICE_LEAD_MEMBER', 'custom_28');
 
 require_once 'aoservicenav.civix.php';
 
@@ -154,6 +155,11 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
         else {
           $form->add('text', $name, $fieldLabel, NULL);
         }
+
+        // Validations
+        if ($rowNumber == 1 && $fieldName != "child_gender") {
+          $form->addRule($name, ts($fieldLabel . ' is a required field.'), 'required');
+        }
       }
     }
     $form->assign('childSubmitted', json_encode($submittedValues));
@@ -211,18 +217,63 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         }
       }
     }
+    $address = civicrm_api3('Address', 'get', ['contact_id' => $contactID])['values'];
     $childRel = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Child of', 'id', 'name_a_b');
-    foreach ($contactParams as $child) {
+    $sibling = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Sibling of', 'id', 'name_a_b');
+    foreach ($contactParams as $key => $child) {
       $dedupeParams = CRM_Dedupe_Finder::formatParams($child, 'Individual');
       $dedupeParams['check_permission'] = FALSE;
       $rule = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_dedupe_rule_group WHERE name = 'Child_Rule_10'");
       $dupes = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', NULL, array(), $rule);
       $cid = CRM_Utils_Array::value('0', $dupes, NULL);
       $child['contact_type'] = 'Individual';
+      $child['contact_sub_type'] = 'Child';
+      if ($key == 1) {
+        $child[SERVICE_LEAD_MEMBER] = 1;
+      }
       if ($cid) {
         $child['contact_id'] = $cid;
       }
       $childId = civicrm_api3('Contact', 'create', $child)['id'];
+
+      $children[$key] = $childId;
+
+      $isFilled = CRM_Core_DAO::executeQuery("SELECT
+        entity_id FROM civicrm_value_newsletter_cu_3 WHERE entity_id IN (" . $childId . ") AND (first_contacted_358 IS NOT NULL OR first_contacted_358 != '')")->fetchAll();
+      if (empty($isFilled)) {
+        civicrm_api3('CustomValue', 'create', [
+          'entity_id' => $childId,
+          'custom_29' => date('Ymd'),
+        ]);
+      }
+      // Add I am a person with ASD.
+      civicrm_api3('CustomValue', 'create', [
+        'entity_id' => $childId,
+        'custom_7' => 'Une personne TSA',
+      ]);
+
+      // Add address for child.
+      foreach ($address as $k => &$val) {
+        unset($val['id']);
+        $val['contact_id'] = $childId;
+        $val['master_id'] = $k;
+        civicrm_api3('Address', 'create', $address[$k]);
+      }
+
+      if (!empty($params['postal_code-Primary'])) {
+        list($chapter, $region, $service, $sub) = getServiceChapRegCodes($params['postal_code-Primary']);
+        if ($chapter || $region) {
+          $cParams = [
+            'chapter' => $chapter,
+            'region' => $region,
+            'service_region' => $service,
+            'service_sub_region' => $sub,
+            'contact_id' => $childId,
+          ];
+          setServiceChapRegCodes($cParams);
+        }
+      }
+
       createServiceRelationship($childId, $contactID, $childRel);
 
       civicrm_api3('Case', 'create', [
@@ -234,6 +285,24 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         'status_id' => "Urgent",
       ]);
     }
+    if (!empty($children[2])) {
+      createServiceRelationship($children[1], $children[2], $sibling);
+    }
+    if (!empty($contact[3])) {
+      createServiceRelationship($children[1], $children[3], $sibling);
+      createServiceRelationship($children[2], $children[3], $sibling);
+    }
+    if (!empty($contact[4])) {
+      createServiceRelationship($children[1], $children[4], $sibling);
+      createServiceRelationship($children[2], $children[4], $sibling);
+      createServiceRelationship($children[3], $children[4], $sibling);
+    }
+    if (!empty($contact[5])) {
+      createServiceRelationship($children[1], $children[5], $sibling);
+      createServiceRelationship($children[2], $children[5], $sibling);
+      createServiceRelationship($children[3], $children[5], $sibling);
+      createServiceRelationship($children[4], $children[5], $sibling);
+    }
   }
 }
 
@@ -244,4 +313,73 @@ function createServiceRelationship($cida, $cidb, $type) {
     "relationship_type_id" => $type,
   );
   civicrm_api3("Relationship", "create", $relationshipParams);
+}
+
+function getServiceChapRegCodes($postalCode) {
+  $chapterCode = substr($postalCode, 0, 3);
+  $sql = "SELECT service_region, service_sub_region, region, chapter FROM chapters WHERE pcode = '{$chapterCode}'";
+  $dao = CRM_Core_DAO::executeQuery($sql);
+  while ($dao->fetch()) {
+    $region = $dao->region;
+    $chapter = $dao->chapter;
+    $service = $dao->service_region;
+    $sub = $dao->service_sub_region;
+  }
+  return [$chapter, $region, $service, $sub];
+}
+
+function getServiceChapRegIds() {
+  $chapterId = civicrm_api3('CustomField', 'getvalue', array(
+    'name' => 'Chapter',
+    'return' => 'id',
+    'custom_group_id' => "chapter_region",
+  ));
+
+  $regionId = civicrm_api3('CustomField', 'getvalue', array(
+    'name' => 'Region',
+    'return' => 'id',
+    'custom_group_id' => "chapter_region",
+  ));
+
+  $serviceRegionId = civicrm_api3('CustomField', 'getvalue', array(
+    'name' => 'Service_Region',
+    'return' => 'id',
+    'custom_group_id' => "chapter_region",
+  ));
+
+  $subRegionId = civicrm_api3('CustomField', 'getvalue', array(
+    'name' => 'Service_Sub_Region',
+    'return' => 'id',
+    'custom_group_id' => "chapter_region",
+  ));
+  return [$chapterId, $regionId, $serviceRegionId, $subRegionId];
+}
+
+function setServiceChapRegCodes($params, $existingCodes = []) {
+  list($chapterId, $regionId, $serviceRegionId, $subRegionId) = getServiceChapRegIds();
+
+  if (!empty($params['chapter'])) {
+    civicrm_api3('CustomValue', 'create', array(
+      'entity_id' => $params['contact_id'],
+      'custom_' . $chapterId => $params['chapter'],
+    ));
+  }
+  if (!empty($params['region'])) {
+    civicrm_api3('CustomValue', 'create', array(
+      'entity_id' => $params['contact_id'],
+      'custom_' . $regionId => $params['region'],
+    ));
+  }
+  if (!empty($params['service_region'])) {
+    civicrm_api3('CustomValue', 'create', array(
+      'entity_id' => $params['contact_id'],
+      'custom_' . $serviceRegionId => $params['service_region'],
+    ));
+  }
+  if (!empty($params['service_sub_region'])) {
+    civicrm_api3('CustomValue', 'create', array(
+      'entity_id' => $params['contact_id'],
+      'custom_' . $subRegionId => $params['service_sub_region'],
+    ));
+  }
 }
