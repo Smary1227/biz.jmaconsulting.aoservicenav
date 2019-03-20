@@ -3,6 +3,7 @@ define('SERVICENAV', 131);
 define('IS_REGISTERED', 'custom_774');
 define('DIAGNOSIS', 'custom_773');
 define('SERVICE_LEAD_MEMBER', 'custom_28');
+define('ENEWS_GROUP', 16);
 
 require_once 'aoservicenav.civix.php';
 
@@ -122,6 +123,13 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
       'template' => 'CRM/ServiceNav.tpl',
     ));
 
+    // Second parent
+    $form->add('text', 'second_parent', ts('Second Parent/Guardian First Name (if applicable)'));
+    
+    // Enews
+    $form->add('checkbox', 'is_enews', ts('Please add me to Autism Ontario’s news and event notification list'));
+    $form->assign('isEnews', TRUE);
+
     $submittedValues = [];
     $fields = [
       'child_diagnosis' => ts("Child's Diagnosis"),
@@ -175,6 +183,27 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
   if ($formName == "CRM_Profile_Form_Edit" && $form->getVar('_gid') == SERVICENAV) {
     $params = $form->_submitValues;
     $contactID = $form->getVar('_id');
+
+    // Check if contact present in Enews group.
+    $groupContact = civicrm_api3('GroupContact', 'get', array(
+      'sequential' => 1,
+      'group_id' => ENEWS_GROUP,
+      'contact_id' => $contactID,
+    ));
+    if (!$groupContact['count']) {
+      $groupContact = civicrm_api3('GroupContact', 'create', array(
+        'group_id' => ENEWS_GROUP,
+        'contact_id' => $contactID,
+      ));
+    }
+
+    // Second Parent
+    if (!empty($params['second_parent'])) {
+      $secondParent = civicrm_api3('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => $params['second_parent']])['id'];
+      $spouse = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Spouse of', 'id', 'name_a_b');
+      createServiceRelationship($contactID, $secondParent, $spouse);
+    }
+
     if (!empty($params['child_first_name'])) {
       foreach ($params['child_first_name'] as $key => $value) {
         if ($value) {

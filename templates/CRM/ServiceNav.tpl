@@ -1,3 +1,25 @@
+{if $isEnews}
+<div class="crm-section enews-section form-item" id="enews">
+  <div class="label">{$form.is_enews.label}
+  </div>
+  <div class="content">{$form.is_enews.html}</div>
+  <div class="clear"></div>
+</div>
+
+  {literal}
+    <script type="text/javascript">
+      CRM.$(function($) {
+        $('#enews').insertBefore($('.crm-submit-buttons'));
+      });
+    </script>
+  {/literal}
+{/if}
+<div class="crm-section second_parent-section form-item" id="secondparent">
+  <div class="label">{$form.second_parent.label}
+  </div>
+  <div class="content">{$form.second_parent.html}</div>
+  <div class="clear"></div>
+</div>
 <div id="first-child-asd">
   <fieldset><legend>Child 1</legend></fieldset>
   <div class="crm-section"><div class="label">{$form.child_diagnosis.1.label}</div> <div class="content">{$form.child_diagnosis.1.html}</div></div>
@@ -34,6 +56,7 @@ CRM.$(function($) {
   $('#add-another-item').insertAfter($('#editrow-postal_code-Primary'));
   $('#children-with-asd').insertAfter($('#editrow-postal_code-Primary'));
   $('#first-child-asd').insertAfter($('#editrow-postal_code-Primary'));
+  $('#secondparent').insertAfter($('#editrow-postal_code-Primary'));
 
   var submittedRows = $.parseJSON('{/literal}{$childSubmitted}{literal}');
 
