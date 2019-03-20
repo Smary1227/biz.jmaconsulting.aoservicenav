@@ -149,7 +149,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
           $form->addSelect($name, array('label' => $fieldLabel, 'allowClear' => FALSE, 'options' => $options));
         }
         elseif ($fieldName == "child_diagnosis") {
-          $childasd = CRM_Core_OptionGroup::values('child_asd_20190320203746');
+          $childasd = CRM_Core_OptionGroup::values('child_s_diagnosis_20190320085837');
           $form->addCheckBox($name, $fieldLabel, array_flip($childasd));
         }
         else {
