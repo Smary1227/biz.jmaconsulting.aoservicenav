@@ -124,7 +124,8 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
     ));
 
     // Second parent
-    $form->add('text', 'second_parent', ts('Second Parent/Guardian First Name (if applicable)'));
+    $form->add('text', 'second_parent_first_name', ts('Second Parent/Guardian First Name (if applicable)'));
+    $form->add('text', 'second_parent_last_name', ts('Second Parent/Guardian Last Name (if applicable)'));
     
     // Enews
     $form->add('checkbox', 'is_enews', ts('Please add me to Autism Ontario’s news and event notification list'));
@@ -212,10 +213,19 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
     }
 
     // Second Parent
-    if (!empty($params['second_parent'])) {
-      $secondParent = civicrm_api3('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => $params['second_parent']])['id'];
+    if (!empty($params['second_parent_first_name']) || !empty($params['second_parent_last_name'])) {
+      $secondParent = civicrm_api3('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => $params['second_parent_first_name'], 'last_name' => $params['second_parent_last_name']])['id'];
       $spouse = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Spouse of', 'id', 'name_a_b');
       createServiceRelationship($contactID, $secondParent, $spouse);
+      if (!empty($cParams)) {
+        $cParams['contact_id'] = $spouse;
+        setServiceChapRegCodes($cParams);
+      }
+      foreach ($address as $k => &$val) {
+        unset($val['id']);
+        $val['contact_id'] = $spouse;
+        civicrm_api3('Address', 'create', $address[$k]);
+      }
     }
 
     if (!empty($params['child_first_name'])) {

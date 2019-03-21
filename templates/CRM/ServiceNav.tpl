@@ -15,9 +15,13 @@
   {/literal}
 {/if}
 <div class="crm-section second_parent-section form-item" id="secondparent">
-  <div class="label">{$form.second_parent.label}
+  <div class="label">{$form.second_parent_first_name.label}
   </div>
-  <div class="content">{$form.second_parent.html}</div>
+  <div class="content">{$form.second_parent_first_name.html}</div>
+  <div class="clear"></div>
+  <div class="label">{$form.second_parent_last_name.label}
+  </div>
+  <div class="content">{$form.second_parent_last_name.html}</div>
   <div class="clear"></div>
 </div>
 <div id="first-child-asd">
