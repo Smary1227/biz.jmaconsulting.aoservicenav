@@ -175,6 +175,37 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
   }
 }
 
+
+function aoservicenav_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
+  if ($formName == "CRM_Case_Form_Case" && ($form->_action & CRM_Core_Action::ADD)) {
+    $case = array_flip(CRM_Case_BAO_Case::buildOptions('case_type_id'));
+    if ($fields['case_type_id'] == $case["Service Navigation"]) {
+      $cid = $fields['client_id'];
+      $leadMember = "";
+      $parent = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Parent of', 'id', 'name_b_a');
+      $relationship = civicrm_api3('Relationship', 'get', [
+        'sequential' => 1,
+        'return' => ["contact_id_a"],
+        'relationship_type_id' => $parent,
+        'contact_id_b' => $cid,
+      ])['values'];
+      foreach ($relationship as $contact) {
+        $custom = civicrm_api3('CustomValue', 'get', [
+          'sequential' => 1,
+          'return' => [SERVICE_LEAD_MEMBER],
+          'entity_id' => $contact['contact_id_a'],
+        ]);
+        if ($custom['count']) {
+          $leadMember = $custom['values'][0]['latest'];
+        }
+      }
+      if (!$leadMember) {
+        $errors['client_id'] = ts('This client does not have a lead family member. Please create one and try to save the Service Navigation Request.');
+      }
+    }
+  }
+}
+
 /**
  * Implementation of hook_civicrm_postProcess
  *
@@ -327,6 +358,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         'subject' => "Service navigation",
         'start_date' => date('Ymd'),
         'status_id' => "Urgent",
+        'creator_id' => CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_email WHERE email LIKE 'stefanie@autismontario.com'"),
       ]);
     }
     if (!empty($children[2])) {
