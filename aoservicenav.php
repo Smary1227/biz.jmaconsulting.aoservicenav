@@ -167,7 +167,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
 
         // Validations
         if ($rowNumber == 1 && $fieldName != "child_gender") {
-          $form->addRule($name, ts($fieldLabel . ' is a required field.'), 'required');
+          $form->addRule($name, ts('%1 is a required field.', [1 => $fieldLabel]), 'required');
         }
       }
     }
