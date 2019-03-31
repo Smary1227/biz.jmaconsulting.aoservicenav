@@ -123,6 +123,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/ServiceNav.tpl',
     ));
+    CRM_Core_Resources::singleton()->addStyleFile('biz.jmaconsulting.aoservicenav', 'templates/css/style.css');
 
     // Second parent
     $form->add('text', 'second_parent_first_name', E::ts('Second Parent/Guardian First Name (if applicable)'));
@@ -173,6 +174,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
       }
     }
     $form->assign('childSubmitted', json_encode($submittedValues));
+    $form->assign('childLabel', E::ts('Add another child'));
   }
 }
 

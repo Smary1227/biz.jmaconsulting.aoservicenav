@@ -52,7 +52,7 @@
     </div>
 {/section}
 </div>
-<span id="add-another-item" class="crm-hover-button" style="font-weight:bold;padding:10px;"><a href=#>{ts}Add another child{/ts}</a></span>
+<span id="add-another-item" class="crm-hover-button" style="font-weight:bold;padding:10px;"><a href=#>{$childLabel}</a></span>
 
 {literal}
 <script type="text/javascript">
