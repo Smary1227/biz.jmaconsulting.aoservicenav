@@ -6,6 +6,7 @@ define('SERVICE_LEAD_MEMBER', 'custom_28');
 define('ENEWS_GROUP', 16);
 
 require_once 'aoservicenav.civix.php';
+use CRM_Aoservicenav_ExtensionUtil as E;
 
 /**
  * Implementation of hook_civicrm_config
@@ -211,16 +212,6 @@ function aoservicenav_civicrm_validateForm($formName, &$fields, &$files, &$form,
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postProcess
  */
 function aoservicenav_civicrm_postProcess($formName, &$form) {
-  if ($formName == "CRM_Event_Form_ManageEvent_EventInfo" && ($form->_action & CRM_Core_Action::ADD)) {
-    if (CRM_Utils_Array::value('event_type_id', $form->_submitValues) == 7) {
-      $result = civicrm_api3('Group', 'create', [
-        'title' => $form->_submitValues['title'] . ' Registrants',
-        'is_active' => TRUE,
-        'group_type' => "Mailing List",
-        'visibility' => ["User and User Admin Only"],
-      ]);
-    }
-  }
   if ($formName == "CRM_Profile_Form_Edit" && $form->getVar('_gid') == SERVICENAV) {
     $params = $form->_submitValues;
     $contactID = $form->getVar('_id');
