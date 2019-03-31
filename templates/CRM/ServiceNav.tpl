@@ -25,7 +25,9 @@
   <div class="clear"></div>
 </div>
 <div id="first-child-asd">
-  <fieldset><legend>Child 1</legend></fieldset>
+  {crmScope extensionKey='biz.jmaconsulting.aoservicenav'}
+  <fieldset><legend>{ts}Child 1{/ts}</legend></fieldset>
+  {/crmScope}
   <div class="crm-section"><div class="label">{$form.child_diagnosis.1.label}</div> <div class="content">{$form.child_diagnosis.1.html}</div></div>
   <div class="crm-section"><div class="label">{$form.child_first_name.1.label}</div> <div class="content">{$form.child_first_name.1.html}</div></div>
   <div class="crm-section"><div class="label">{$form.child_last_name.1.label}</div> <div class="content">{$form.child_last_name.1.html}</div></div>
@@ -39,7 +41,9 @@
 {section name='i' start=2 loop=6}
     {assign var='rowNumber' value=$smarty.section.i.index}
     <div id="add-item-row-{$rowNumber}" class="child-row hiddenElement">
-      <fieldset><legend>Child {$rowNumber}</legend></fieldset>
+      {crmScope extensionKey='biz.jmaconsulting.aoservicenav'}
+      <fieldset><legend>{ts}Child {$rowNumber}{/ts}</legend></fieldset>
+      {/crmScope}
       <div class="crm-section"><div class="label">{$form.child_diagnosis.$rowNumber.label}</div> <div class="content">{$form.child_diagnosis.$rowNumber.html}</div></div>
       <div class="crm-section"><div class="label">{$form.child_first_name.$rowNumber.label}</div> <div class="content">{$form.child_first_name.$rowNumber.html}</div></div>
       <div class="crm-section"><div class="label">{$form.child_last_name.$rowNumber.label}</div> <div class="content">{$form.child_last_name.$rowNumber.html}</div></div>
@@ -47,7 +51,9 @@
       <div class="crm-section"><div class="label">{$form.child_gender.$rowNumber.label}</div> <div class="content">{$form.child_gender.$rowNumber.html}</div></div>
       <div class="clear"></div>
       <div class="crm-section"><div class="label">{$form.child_is_registered.$rowNumber.label}</div> <div class="content">{$form.child_is_registered.$rowNumber.html}</div></div>
-      <div class="crm-section"><div class="label"><a href=# class="remove_item crm-hover-button" title='Remove Child'><i class="crm-i fa-times"></i></a></div></div>
+      {crmScope extensionKey='biz.jmaconsulting.aoservicenav'}
+      <div class="crm-section"><div class="label"><a href=# class="remove_item crm-hover-button" title='{ts}Remove Child{/ts}'><i class="crm-i fa-times"></i></a></div></div>
+      {/crmScope}
       <div class="clear"></div>
     </div>
 {/section}
