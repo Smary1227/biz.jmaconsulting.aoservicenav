@@ -52,7 +52,9 @@
     </div>
 {/section}
 </div>
-<span id="add-another-item" class="crm-hover-button" style="font-weight:bold;padding:10px;"><a href=#>{$childLabel}</a></span>
+{crmScope extensionKey='biz.jmaconsulting.aoservicenav'}
+<span id="add-another-item" class="crm-hover-button" style="font-weight:bold;padding:10px;"><a href=#>{ts}Add another child{/ts}</a></span>
+{/crmScope}
 
 {literal}
 <script type="text/javascript">

@@ -174,7 +174,6 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
       }
     }
     $form->assign('childSubmitted', json_encode($submittedValues));
-    $form->assign('childLabel', E::ts('Add another child'));
   }
 }
 
