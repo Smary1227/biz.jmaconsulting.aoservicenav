@@ -125,21 +125,21 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
     ));
 
     // Second parent
-    $form->add('text', 'second_parent_first_name', ts('Second Parent/Guardian First Name (if applicable)'));
-    $form->add('text', 'second_parent_last_name', ts('Second Parent/Guardian Last Name (if applicable)'));
+    $form->add('text', 'second_parent_first_name', E::ts('Second Parent/Guardian First Name (if applicable)'));
+    $form->add('text', 'second_parent_last_name', E::ts('Second Parent/Guardian Last Name (if applicable)'));
     
     // Enews
-    $form->add('checkbox', 'is_enews', ts('Please add me to Autism Ontario’s news and event notification list'));
+    $form->add('checkbox', 'is_enews', E::ts('Please add me to Autism Ontario’s news and event notification list'));
     $form->assign('isEnews', TRUE);
 
     $submittedValues = [];
     $fields = [
-      'child_diagnosis' => ts("Child's Diagnosis"),
-      'child_first_name' => ts("Child's First Name"),
-      'child_last_name' => ts("Child's Last Name"),
-      'child_birth_date' => ts("Child's Birth Date"),
-      'child_gender' => ts("Gender of Child with ASD?"),
-      'child_is_registered' => ts("Is your child registered with the Ontario Autism Program?"),
+      'child_diagnosis' => E::ts("Child's Diagnosis"),
+      'child_first_name' => E::ts("Child's First Name"),
+      'child_last_name' => E::ts("Child's Last Name"),
+      'child_birth_date' => E::ts("Child's Birth Date"),
+      'child_gender' => E::ts("Gender of Child with ASD?"),
+      'child_is_registered' => E::ts("Is your child registered with the Ontario Autism Program?"),
     ];
     for ($rowNumber = 1; $rowNumber <= 6; $rowNumber++) {
       if (!empty($_POST['child_first_name']) && !empty($_POST['child_first_name'][$rowNumber])) {
@@ -168,7 +168,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
 
         // Validations
         if ($rowNumber == 1 && $fieldName != "child_gender") {
-          $form->addRule($name, ts('%1 is a required field.', [1 => $fieldLabel]), 'required');
+          $form->addRule($name, E::ts('%1 is a required field.', [1 => $fieldLabel]), 'required');
         }
       }
     }
@@ -200,7 +200,7 @@ function aoservicenav_civicrm_validateForm($formName, &$fields, &$files, &$form,
         }
       }
       if (!$leadMember) {
-        $errors['client_id'] = ts('This client does not have a lead family member. Please create one and try to save the Service Navigation Request.');
+        $errors['client_id'] = E::ts('This client does not have a lead family member. Please create one and try to save the Service Navigation Request.');
       }
     }
   }
