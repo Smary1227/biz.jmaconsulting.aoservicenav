@@ -207,9 +207,6 @@ function aoservicenav_civicrm_validateForm($formName, &$fields, &$files, &$form,
   }
 }
 
-function aoservicenav_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-}
-
 /**
  * Implementation of hook_civicrm_postProcess
  *
