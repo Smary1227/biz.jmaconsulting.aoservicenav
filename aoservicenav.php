@@ -1,5 +1,5 @@
 <?php
-define('SERVICENAV', 15);
+define('SERVICENAV', 131);
 define('IS_REGISTERED', 'custom_774');
 define('DIAGNOSIS', 'custom_773');
 define('SERVICE_LEAD_MEMBER', 'custom_28');
@@ -119,7 +119,7 @@ function aoservicenav_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_buildForm
  */
 function aoservicenav_civicrm_buildForm($formName, &$form) {
-  if ($formName == "CRM_Profile_Form_Edit" && $form->getVar('_gid') == 12) {
+  if ($formName == "CRM_Profile_Form_Edit" && $form->getVar('_gid') == SERVICENAV) {
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/ServiceNav.tpl',
     ));
@@ -218,8 +218,6 @@ function aoservicenav_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 function aoservicenav_civicrm_postProcess($formName, &$form) {
   if ($formName == "CRM_Profile_Form_Edit" && $form->getVar('_gid') == SERVICENAV) {
     $params = $form->_submitValues;
-    CRM_Core_Error::debug( '$form', CRM_Core_Smarty::singleton() );
-    exit;
     $contactID = $form->getVar('_id');
 
     if (!empty($params['postal_code-Primary'])) {
