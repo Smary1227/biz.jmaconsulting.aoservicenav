@@ -61,3 +61,20 @@ msgstr ""
 msgid "Add another child"
 msgstr "Ajouter un autre enfant"
 
+msgid "Child 1"
+msgstr "Enfant 1"
+
+msgid "Child 2"
+msgstr "Enfant 2"
+
+msgid "Child 3"
+msgstr "Enfant 3"
+
+msgid "Child 4"
+msgstr "Enfant 4"
+
+msgid "Child 5"
+msgstr "Enfant 5"
+
+msgid "This is a required field."
+msgstr "Ce champ est obligatoire."
