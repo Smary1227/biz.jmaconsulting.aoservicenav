@@ -4,6 +4,7 @@ define('IS_REGISTERED', 'custom_774');
 define('DIAGNOSIS', 'custom_773');
 define('SERVICE_LEAD_MEMBER', 'custom_28');
 define('ENEWS_GROUP', 16);
+define('PROVISION', 136);
 
 require_once 'aoservicenav.civix.php';
 use CRM_Aoservicenav_ExtensionUtil as E;
@@ -174,6 +175,14 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
       }
     }
     $form->assign('childSubmitted', json_encode($submittedValues));
+  }
+}
+
+function aoservicenav_civicrm_pre($op, $objectName, $id, &$params) {
+  if ($objectName == 'Activity' && $op == 'create') {
+    if ((CRM_Utils_Array::value('activity_type_id', $params) == PROVISION) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
+      $params['activity_date_time'] = date('YmdHis');      
+    }
   }
 }
 
@@ -458,5 +467,30 @@ function setServiceChapRegCodes($params, $existingCodes = []) {
       'entity_id' => $params['contact_id'],
       'custom_' . $subRegionId => $params['service_sub_region'],
     ));
+  }
+}
+
+function aoservicenav_civicrm_alterReportVar($type, &$columns, &$form) {
+  if ('CRM_Report_Form_Activity' == get_class($form)) {
+    if ($type == 'columns') {
+      $columns['civicrm_activity_contact']['filters']['record_type_id'] = array(
+        'name' => 'record_type_id',
+        'title' => ts('Record type'),
+        'type' => CRM_Utils_Type::T_INT,
+        'operatorType' => CRM_Report_Form::OP_SELECT,
+        'options' => ['' => '- select -' ] + CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate'),
+      );
+    }
+    if ($type == 'sql' && CRM_Utils_Array::value("record_type_id_value", $form->getVar('_params')) == 1) {
+      $contactID = CRM_Core_Session::singleton()->get('userID');
+      $match = "contact_id = " . $contactID;
+      $replace = $match . " AND record_type_id = 1";
+      foreach ($form->sqlFormattedArray as $key => $sql) {
+        if (strpos($sql, 'record_type_id = 1') !== false) {
+          $form->sqlFormattedArray[$key] = str_replace($match, $replace, $sql);
+        }
+      }
+        CRM_Core_Error::debug( '$form', $form->sqlFormattedArray );
+    }
   }
 }
