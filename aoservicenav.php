@@ -469,28 +469,3 @@ function setServiceChapRegCodes($params, $existingCodes = []) {
     ));
   }
 }
-
-function aoservicenav_civicrm_alterReportVar($type, &$columns, &$form) {
-  if ('CRM_Report_Form_Activity' == get_class($form)) {
-    if ($type == 'columns') {
-      $columns['civicrm_activity_contact']['filters']['record_type_id'] = array(
-        'name' => 'record_type_id',
-        'title' => ts('Record type'),
-        'type' => CRM_Utils_Type::T_INT,
-        'operatorType' => CRM_Report_Form::OP_SELECT,
-        'options' => ['' => '- select -' ] + CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate'),
-      );
-    }
-    if ($type == 'sql' && CRM_Utils_Array::value("record_type_id_value", $form->getVar('_params')) == 1) {
-      $contactID = CRM_Core_Session::singleton()->get('userID');
-      $match = "contact_id = " . $contactID;
-      $replace = $match . " AND record_type_id = 1";
-      foreach ($form->sqlFormattedArray as $key => $sql) {
-        if (strpos($sql, 'record_type_id = 1') !== false) {
-          $form->sqlFormattedArray[$key] = str_replace($match, $replace, $sql);
-        }
-      }
-        CRM_Core_Error::debug( '$form', $form->sqlFormattedArray );
-    }
-  }
-}
