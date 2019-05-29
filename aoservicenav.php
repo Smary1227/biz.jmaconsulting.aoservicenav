@@ -4,7 +4,8 @@ define('IS_REGISTERED', 'custom_774');
 define('DIAGNOSIS', 'custom_773');
 define('SERVICE_LEAD_MEMBER', 'custom_28');
 define('ENEWS_GROUP', 16);
-define('PROVISION', 136);
+define('REQUEST', 136);
+define('PROVISION', 72);
 
 require_once 'aoservicenav.civix.php';
 use CRM_Aoservicenav_ExtensionUtil as E;
@@ -120,6 +121,19 @@ function aoservicenav_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_buildForm
  */
 function aoservicenav_civicrm_buildForm($formName, &$form) {
+  if ($formName == "CRM_Contribute_Form_Contribution") {
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/AddBillingDetails.tpl',
+    ));
+  }
+  if ($formName == "CRM_Activity_Form_Activity") {
+    if ($form->_action & CRM_Core_Action::VIEW) {
+      $form->assign('isView', TRUE);
+    }
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/AddSubActivity.tpl',
+    ));
+  }
   if ($formName == "CRM_Profile_Form_Edit" && $form->getVar('_gid') == SERVICENAV) {
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/ServiceNav.tpl',
@@ -180,8 +194,27 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
 
 function aoservicenav_civicrm_pre($op, $objectName, $id, &$params) {
   if ($objectName == 'Activity' && $op == 'create') {
-    if ((CRM_Utils_Array::value('activity_type_id', $params) == PROVISION) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
-      $params['activity_date_time'] = date('YmdHis');      
+    if ((CRM_Utils_Array::value('activity_type_id', $params) == REQUEST) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
+      $params['activity_date_time'] = date('YmdHis');
+    }
+  }
+  if ($objectName == 'Activity' && $op == 'edit') {
+    if (!empty($params['id']) && $params['status_id'] == 2) {
+      $changeDate = FALSE;
+      if ((CRM_Utils_Array::value('activity_type_id', $params) == PROVISION)) {
+        $changeDate = TRUE;
+      }
+      else {
+        // Retrieve activity type id again.
+        $activityTypeId = CRM_Core_DAO::singleValueQuery("SELECT activity_type_id FROM civicrm_activity WHERE id = %1", [1 => [$params['id'], "Integer"]]);
+        if ($activityTypeId == PROVISION) {
+          $changeDate = TRUE;
+        }
+      }
+      if ($changeDate) {
+        // Change date to completed.
+        $params['activity_date_time'] = date('YmdHis');
+      }
     }
   }
 }
@@ -210,7 +243,7 @@ function aoservicenav_civicrm_validateForm($formName, &$fields, &$files, &$form,
         }
       }
       if (!$leadMember) {
-        $errors['client_id'] = E::ts('This client does not have a lead family member. Please create one and try to save the Service Navigation Request.');
+        //$errors['client_id'] = E::ts('This client does not have a lead family member. Please create one and try to save the Service Navigation Request.');
       }
     }
   }
