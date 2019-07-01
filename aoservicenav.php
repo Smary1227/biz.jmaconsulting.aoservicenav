@@ -192,6 +192,12 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
   }
 }
 
+function aoservicenav_civicrm_apiWrappers(&$wrappers, $apiRequest) {
+  if ($apiRequest['entity'] == 'Activity' && $apiRequest['action'] == 'create') {
+    $wrappers[] = new CRM_Aoservicenav_APIWrappers_StatusCheck();
+  }
+}
+
 function aoservicenav_civicrm_pre($op, $objectName, $id, &$params) {
   if ($objectName == 'Activity' && $op == 'create') {
     if ((CRM_Utils_Array::value('activity_type_id', $params) == REQUEST) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
@@ -243,7 +249,7 @@ function aoservicenav_civicrm_validateForm($formName, &$fields, &$files, &$form,
         }
       }
       if (!$leadMember) {
-        //$errors['client_id'] = E::ts('This client does not have a lead family member. Please create one and try to save the Service Navigation Request.');
+        $errors['client_id'] = E::ts('This client does not have a lead family member. Please create one and try to save the Service Navigation Request.');
       }
     }
   }
