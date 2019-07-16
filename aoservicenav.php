@@ -217,6 +217,9 @@ function aoservicenav_civicrm_pre($op, $objectName, $id, &$params) {
           $changeDate = TRUE;
         }
       }
+      if (!empty($params['activity_date_time'])) {
+        $changeDate = FALSE;
+      }
       if ($changeDate) {
         // Change date to completed.
         $params['activity_date_time'] = date('YmdHis');
