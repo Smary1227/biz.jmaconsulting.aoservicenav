@@ -445,7 +445,7 @@ function createServiceRelationship($cida, $cidb, $type) {
 
 function getServiceChapRegCodes($postalCode) {
   $chapterCode = strtoupper(substr($postalCode, 0, 3));
-  $sql = "SELECT service_region, service_sub_region, region, chapter FROM chapters WHERE pcode = '{$chapterCode}'";
+  $sql = "SELECT service_region, service_sub_region, region, chapter FROM chapters_lookup WHERE pcode = '{$chapterCode}'";
   $dao = CRM_Core_DAO::executeQuery($sql);
   while ($dao->fetch()) {
     $region = $dao->region;
