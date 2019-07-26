@@ -364,13 +364,13 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
       $cid = CRM_Utils_Array::value('0', $dupes, NULL);
       $child['contact_type'] = 'Individual';
       $child['contact_sub_type'] = 'Child';
-      if ($key == 1) {
-        $child[SERVICE_LEAD_MEMBER] = 1;
-      }
       if ($cid) {
         $child['contact_id'] = $cid;
       }
       $childId = civicrm_api3('Contact', 'create', $child)['id'];
+      if ($key == 1) {
+        $leadChildId = $childId;
+      }
 
       $children[$key] = $childId;
 
@@ -413,19 +413,24 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         'creator_id' => CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_email WHERE email LIKE 'stefanie@autismontario.com'"),
       ]);
     }
+    // Check if contact has child with lead family member. If he doesn't then add first child as lead member.
+    $isLeadFamilyPresent = CRM_Core_DAO::singleValueQuery("SELECT n.lead_family_member__28 FROM civicrm_value_newsletter_cu_3 n INNER JOIN civicrm_relationship r ON n.entity_id = r.contact_id_a WHERE r.relationship_type_id = 1 AND r.contact_id_b = %1 AND n.lead_family_member__28 = 1 LIMIT 1", [1 => [$contactID, 'Integer']]);
+    if (empty($isLeadFamilyPresent)) {
+      civicrm_api3('Contact', 'create', ['id' => $leadChildId, SERVICE_LEAD_MEMBER => 1]);
+    }
     if (!empty($children[2])) {
       createServiceRelationship($children[1], $children[2], $sibling);
     }
-    if (!empty($contact[3])) {
+    if (!empty($children[3])) {
       createServiceRelationship($children[1], $children[3], $sibling);
       createServiceRelationship($children[2], $children[3], $sibling);
     }
-    if (!empty($contact[4])) {
+    if (!empty($children[4])) {
       createServiceRelationship($children[1], $children[4], $sibling);
       createServiceRelationship($children[2], $children[4], $sibling);
       createServiceRelationship($children[3], $children[4], $sibling);
     }
-    if (!empty($contact[5])) {
+    if (!empty($children[5])) {
       createServiceRelationship($children[1], $children[5], $sibling);
       createServiceRelationship($children[2], $children[5], $sibling);
       createServiceRelationship($children[3], $children[5], $sibling);
