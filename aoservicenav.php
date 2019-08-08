@@ -304,10 +304,11 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         $cParams['contact_id'] = $spouse;
         setServiceChapRegCodes($cParams);
       }
-      foreach ($address as $k => &$val) {
+      $spouseAddress = civicrm_api3('Address', 'get', ['contact_id' => $contactID])['values'];
+      foreach ($spouseAddress as $k => &$val) {
         unset($val['id']);
         $val['contact_id'] = $spouse;
-        civicrm_api3('Address', 'create', $address[$k]);
+        civicrm_api3('Address', 'create', $spouseAddress[$k]);
       }
     }
 
