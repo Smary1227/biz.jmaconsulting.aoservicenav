@@ -164,7 +164,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
       foreach ($fields as $fieldName => $fieldLabel) {
         $name = sprintf("%s[%d]", $fieldName, $rowNumber);
         if ($fieldName == "child_birth_date") {
-          $form->add('datepicker', $name, $fieldLabel, array(), FALSE, array('time' => FALSE, 'yearRange' => "-100:+0"));
+          $form->add('datepicker', $name, $fieldLabel, array(), FALSE, array('time' => FALSE, 'yearRange' => "-19:+0", 'maxDate' => date('Y-m-d')));
         }
         elseif ($fieldName == "child_gender") {
           $gender = CRM_Core_OptionGroup::values('gender');
