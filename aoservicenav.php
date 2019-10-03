@@ -143,7 +143,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
     // Second parent
     $form->add('text', 'second_parent_first_name', E::ts('Second Parent/Guardian First Name (if applicable)'));
     $form->add('text', 'second_parent_last_name', E::ts('Second Parent/Guardian Last Name (if applicable)'));
-    
+
     // Enews
     $form->add('checkbox', 'is_enews', E::ts('Please add me to Autism Ontario’s news and event notification list'));
     $form->assign('isEnews', TRUE);
@@ -282,6 +282,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
       }
     }
 
+    /*
     // Check if contact present in Enews group.
     $groupContact = civicrm_api3('GroupContact', 'get', array(
       'sequential' => 1,
@@ -294,6 +295,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         'contact_id' => $contactID,
       ));
     }
+    */
 
     // Second Parent
     if (!empty($params['second_parent_first_name']) || !empty($params['second_parent_last_name'])) {
