@@ -130,9 +130,9 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
     if ($form->_action & CRM_Core_Action::VIEW) {
       $form->assign('isView', TRUE);
     }
-    CRM_Core_Region::instance('page-body')->add(array(
+    /* CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/AddSubActivity.tpl',
-    ));
+    )); */
   }
   if ($formName == "CRM_Profile_Form_Edit" && $form->getVar('_gid') == SERVICENAV) {
     CRM_Core_Region::instance('page-body')->add(array(
@@ -303,15 +303,15 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
       $spouse = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Spouse of', 'id', 'name_a_b');
       createServiceRelationship($contactID, $secondParent, $spouse);
       if (!empty($cParams)) {
-        $cParams['contact_id'] = $spouse;
+        $cParams['contact_id'] = $secondParent;
         setServiceChapRegCodes($cParams);
       }
-      $spouseAddress = civicrm_api3('Address', 'get', ['contact_id' => $contactID])['values'];
+      /* $spouseAddress = civicrm_api3('Address', 'get', ['contact_id' => $contactID])['values'];
       foreach ($spouseAddress as $k => &$val) {
         unset($val['id']);
         $val['contact_id'] = $spouse;
         civicrm_api3('Address', 'create', $spouseAddress[$k]);
-      }
+      } */
     }
 
     if (!empty($params['child_first_name'])) {
@@ -455,6 +455,7 @@ function getServiceChapRegCodes($postalCode) {
   $chapterCode = strtoupper(substr($postalCode, 0, 3));
   $sql = "SELECT service_region, service_sub_region, region, chapter FROM chapters_lookup WHERE pcode = '{$chapterCode}'";
   $dao = CRM_Core_DAO::executeQuery($sql);
+  $region = $chapter = $service = $sub = "";
   while ($dao->fetch()) {
     $region = $dao->region;
     $chapter = $dao->chapter;
