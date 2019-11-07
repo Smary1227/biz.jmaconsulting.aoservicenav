@@ -396,6 +396,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         unset($val['id']);
         $val['contact_id'] = $childId;
         $val['master_id'] = $k;
+        $val['skip_geocode'] = 1;
         civicrm_api3('Address', 'create', $address[$k]);
       }
 
