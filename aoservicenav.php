@@ -406,17 +406,16 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
       }
 
       createServiceRelationship($childId, $contactID, $childRel);
-
-      civicrm_api3('Case', 'create', [
-        'contact_id' => $contactID,
-        'case_type_id' => "service_navigation",
-        'details' => "Service navigation for " .  CRM_Contact_BAO_Contact::displayName($contactID),
-        'subject' => "Service navigation",
-        'start_date' => date('Ymd'),
-        'status_id' => "Urgent",
-        'creator_id' => CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_email WHERE email LIKE 'stefanie@autismontario.com'"),
-      ]);
     }
+    civicrm_api3('Case', 'create', [
+      'contact_id' => $contactID,
+      'case_type_id' => "service_navigation",
+      'details' => "Service navigation for " .  CRM_Contact_BAO_Contact::displayName($contactID),
+      'subject' => "Service navigation",
+      'start_date' => date('Ymd'),
+      'status_id' => "Urgent",
+      'creator_id' => CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_email WHERE email LIKE 'stefanie@autismontario.com'"),
+    ]);
     // Check if contact has child with lead family member. If he doesn't then add first child as lead member.
     $isLeadFamilyPresent = CRM_Core_DAO::singleValueQuery("SELECT n.lead_family_member__28 FROM civicrm_value_newsletter_cu_3 n INNER JOIN civicrm_relationship r ON n.entity_id = r.contact_id_a WHERE r.relationship_type_id = 1 AND r.contact_id_b = %1 AND n.lead_family_member__28 = 1 LIMIT 1", [1 => [$contactID, 'Integer']]);
     if (empty($isLeadFamilyPresent)) {
