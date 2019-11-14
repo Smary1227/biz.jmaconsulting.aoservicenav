@@ -203,6 +203,11 @@ function aoservicenav_civicrm_pre($op, $objectName, $id, &$params) {
     if ((CRM_Utils_Array::value('activity_type_id', $params) == REQUEST) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
       $params['activity_date_time'] = date('YmdHis');
     }
+    if (( CRM_Utils_Array::value('activity_type_id', $params) == PROVISION) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
+      if (CRM_Core_Session::singleton()->getLoggedInContactID()) {
+        $params['assignee_contact_id'] = [CRM_Core_Session::singleton()->getLoggedInContactID()];
+      }
+    }
   }
   if ($objectName == 'Activity' && $op == 'edit') {
     if (!empty($params['id']) && $params['status_id'] == 2) {
@@ -313,6 +318,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         civicrm_api3('Address', 'create', $spouseAddress[$k]);
       } */
     }
+CRM_Core_Error::debug_var('after second parent', $params);
 
     if (!empty($params['child_first_name'])) {
       foreach ($params['child_first_name'] as $key => $value) {
@@ -359,6 +365,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
     $address = civicrm_api3('Address', 'get', ['contact_id' => $contactID])['values'];
     $childRel = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Child of', 'id', 'name_a_b');
     $sibling = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Sibling of', 'id', 'name_a_b');
+CRM_Core_Error::debug_var('before child', $contactParams);
     foreach ($contactParams as $key => $child) {
       $dedupeParams = CRM_Dedupe_Finder::formatParams($child, 'Individual');
       $dedupeParams['check_permission'] = FALSE;
@@ -390,6 +397,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         'entity_id' => $childId,
         'custom_7' => 'Une personne TSA',
       ]);
+      CRM_Core_Error::debug_var('before address', $contactParams);
 
       // Add address for child.
       foreach ($address as $k => &$val) {
@@ -399,6 +407,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
         $val['skip_geocode'] = 1;
         civicrm_api3('Address', 'create', $address[$k]);
       }
+      CRM_Core_Error::debug_var('after address', $contactParams);
 
       if (!empty($cParams)) {
         $cParams['contact_id'] = $childId;
@@ -416,6 +425,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
       'status_id' => "Urgent",
       'creator_id' => CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_email WHERE email LIKE 'ishmeet@autismontario.com'"),
     ]);
+CRM_Core_Error::debug_var('after case', $contactParams);
     // Check if contact has child with lead family member. If he doesn't then add first child as lead member.
     $isLeadFamilyPresent = CRM_Core_DAO::singleValueQuery("SELECT n.lead_family_member__28 FROM civicrm_value_newsletter_cu_3 n INNER JOIN civicrm_relationship r ON n.entity_id = r.contact_id_a WHERE r.relationship_type_id = 1 AND r.contact_id_b = %1 AND n.lead_family_member__28 = 1 LIMIT 1", [1 => [$contactID, 'Integer']]);
     if (empty($isLeadFamilyPresent)) {
@@ -440,6 +450,7 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
       createServiceRelationship($children[4], $children[5], $sibling);
     }
   }
+CRM_Core_Error::debug_var('end of reg', $contactParams);
 }
 
 function createServiceRelationship($cida, $cidb, $type) {
