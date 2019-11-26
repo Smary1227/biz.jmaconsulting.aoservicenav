@@ -203,7 +203,7 @@ function aoservicenav_civicrm_pre($op, $objectName, $id, &$params) {
     if ((CRM_Utils_Array::value('activity_type_id', $params) == REQUEST) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
       $params['activity_date_time'] = date('YmdHis');
     }
-    if (( CRM_Utils_Array::value('activity_type_id', $params) == PROVISION) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
+    if (( CRM_Utils_Array::value('activity_type_id', $params) == REQUEST || CRM_Utils_Array::value('activity_type_id', $params) == PROVISION) && (CRM_Utils_Array::value('is_auto', $params) == 1)) {
       if (CRM_Core_Session::singleton()->getLoggedInContactID()) {
         $params['assignee_contact_id'] = [CRM_Core_Session::singleton()->getLoggedInContactID()];
       }
