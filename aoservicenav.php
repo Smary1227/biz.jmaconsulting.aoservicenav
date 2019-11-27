@@ -449,8 +449,8 @@ CRM_Core_Error::debug_var('after case', $contactParams);
       createServiceRelationship($children[3], $children[5], $sibling);
       createServiceRelationship($children[4], $children[5], $sibling);
     }
-  }
 CRM_Core_Error::debug_var('end of reg', $contactParams);
+  }
 }
 
 function createServiceRelationship($cida, $cidb, $type) {
