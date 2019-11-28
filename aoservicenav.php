@@ -371,6 +371,7 @@ CRM_Core_Error::debug_var('before child', $contactParams);
       $dedupeParams['check_permission'] = FALSE;
       $rule = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_dedupe_rule_group WHERE name = 'Child_Rule_10'");
       $dupes = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', NULL, array(), $rule);
+CRM_Core_Error::debug('af', $dupes);
       $cid = CRM_Utils_Array::value('0', $dupes, NULL);
       $child['contact_type'] = 'Individual';
       $child['contact_sub_type'] = 'Child';
@@ -459,7 +460,10 @@ function createServiceRelationship($cida, $cidb, $type) {
     "contact_id_b" => $cidb,
     "relationship_type_id" => $type,
   );
-  civicrm_api3("Relationship", "create", $relationshipParams);
+  $rel = civicrm_api3("Relationship", "get", $relationshipParams);
+  if ($rel['count'] < 1) {
+    civicrm_api3("Relationship", "create", $relationshipParams);
+  }
 }
 
 function getServiceChapRegCodes($postalCode) {
