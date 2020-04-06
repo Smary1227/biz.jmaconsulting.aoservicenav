@@ -13,6 +13,9 @@ class CRM_Aoservicenav_APIWrappers_StatusCheck implements API_Wrapper {
 
   public function toApiOutput($apiRequest, $result) {
     if ($apiRequest['entity'] == 'Activity' && $apiRequest['action'] == 'create' && !empty($apiRequest['params']['id'])) {
+      if (!in_array($apiRequest['params']['activity_type_id'], [REQUEST, PROVISION])) {
+        return;
+      }
       $actId = $apiRequest['params']['id'];
       foreach ($apiRequest['fields'] as $field => $fieldVal) {
         if (!empty($fieldVal['is_required'])) {
