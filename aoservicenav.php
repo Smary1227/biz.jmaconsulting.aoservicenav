@@ -274,11 +274,10 @@ function aoservicenav_civicrm_postProcess($formName, &$form) {
     $contactID = $form->getVar('_id');
 
     if (!empty($params['postal_code-Primary'])) {
-      list($chapter, $region, $service, $sub) = getServiceChapRegCodes($params['postal_code-Primary']);
-      if ($chapter || $region || $service || $sub) {
+      list($chapter, $service, $sub) = getServiceChapRegCodes($params['postal_code-Primary']);
+      if ($chapter || $service || $sub) {
         $cParams = [
           'chapter' => $chapter,
-          'region' => $region,
           'service_region' => $service,
           'service_sub_region' => $sub,
           'contact_id' => $contactID,
@@ -365,13 +364,11 @@ CRM_Core_Error::debug_var('after second parent', $params);
     $address = civicrm_api3('Address', 'get', ['contact_id' => $contactID])['values'];
     $childRel = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Child of', 'id', 'name_a_b');
     $sibling = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Sibling of', 'id', 'name_a_b');
-CRM_Core_Error::debug_var('before child', $contactParams);
     foreach ($contactParams as $key => $child) {
       $dedupeParams = CRM_Dedupe_Finder::formatParams($child, 'Individual');
       $dedupeParams['check_permission'] = FALSE;
       $rule = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_dedupe_rule_group WHERE name = 'Child_Rule_10'");
       $dupes = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', NULL, array(), $rule);
-CRM_Core_Error::debug('af', $dupes);
       $cid = CRM_Utils_Array::value('0', $dupes, NULL);
       $child['contact_type'] = 'Individual';
       $child['contact_sub_type'] = 'Child';
@@ -426,7 +423,6 @@ CRM_Core_Error::debug('af', $dupes);
       'status_id' => "Urgent",
       'creator_id' => CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_email WHERE email LIKE 'ishmeet@autismontario.com'"),
     ]);
-CRM_Core_Error::debug_var('after case', $contactParams);
     // Check if contact has child with lead family member. If he doesn't then add first child as lead member.
     $isLeadFamilyPresent = CRM_Core_DAO::singleValueQuery("SELECT n.lead_family_member__28 FROM civicrm_value_newsletter_cu_3 n INNER JOIN civicrm_relationship r ON n.entity_id = r.contact_id_a WHERE r.relationship_type_id = 1 AND r.contact_id_b = %1 AND n.lead_family_member__28 = 1 LIMIT 1", [1 => [$contactID, 'Integer']]);
     if (empty($isLeadFamilyPresent)) {
@@ -450,7 +446,6 @@ CRM_Core_Error::debug_var('after case', $contactParams);
       createServiceRelationship($children[3], $children[5], $sibling);
       createServiceRelationship($children[4], $children[5], $sibling);
     }
-CRM_Core_Error::debug_var('end of reg', $contactParams);
   }
 }
 
@@ -468,27 +463,20 @@ function createServiceRelationship($cida, $cidb, $type) {
 
 function getServiceChapRegCodes($postalCode) {
   $chapterCode = strtoupper(substr($postalCode, 0, 3));
-  $sql = "SELECT service_region, service_sub_region, region, chapter FROM chapters_lookup WHERE pcode = '{$chapterCode}'";
+  $sql = "SELECT service_region, service_sub_region, chapter FROM chapters_lookup WHERE pcode = '{$chapterCode}'";
   $dao = CRM_Core_DAO::executeQuery($sql);
-  $region = $chapter = $service = $sub = "";
+  $chapter = $service = $sub = "";
   while ($dao->fetch()) {
-    $region = $dao->region;
     $chapter = $dao->chapter;
     $service = $dao->service_region;
     $sub = $dao->service_sub_region;
   }
-  return [$chapter, $region, $service, $sub];
+  return [$chapter, $service, $sub];
 }
 
 function getServiceChapRegIds() {
   $chapterId = civicrm_api3('CustomField', 'getvalue', array(
     'name' => 'Chapter',
-    'return' => 'id',
-    'custom_group_id' => "chapter_region",
-  ));
-
-  $regionId = civicrm_api3('CustomField', 'getvalue', array(
-    'name' => 'Region',
     'return' => 'id',
     'custom_group_id' => "chapter_region",
   ));
@@ -504,22 +492,16 @@ function getServiceChapRegIds() {
     'return' => 'id',
     'custom_group_id' => "chapter_region",
   ));
-  return [$chapterId, $regionId, $serviceRegionId, $subRegionId];
+  return [$chapterId, $serviceRegionId, $subRegionId];
 }
 
 function setServiceChapRegCodes($params, $existingCodes = []) {
-  list($chapterId, $regionId, $serviceRegionId, $subRegionId) = getServiceChapRegIds();
+  list($chapterId, $serviceRegionId, $subRegionId) = getServiceChapRegIds();
 
   if (!empty($params['chapter'])) {
     civicrm_api3('CustomValue', 'create', array(
       'entity_id' => $params['contact_id'],
       'custom_' . $chapterId => CRM_Core_DAO::VALUE_SEPARATOR . $params['chapter'] . CRM_Core_DAO::VALUE_SEPARATOR,
-    ));
-  }
-  if (!empty($params['region'])) {
-    civicrm_api3('CustomValue', 'create', array(
-      'entity_id' => $params['contact_id'],
-      'custom_' . $regionId => CRM_Core_DAO::VALUE_SEPARATOR . $params['region'] . CRM_Core_DAO::VALUE_SEPARATOR,
     ));
   }
   if (!empty($params['service_region'])) {
