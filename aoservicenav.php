@@ -154,7 +154,7 @@ function aoservicenav_civicrm_buildForm($formName, &$form) {
       'child_first_name' => E::ts("Child's First Name"),
       'child_last_name' => E::ts("Child's Last Name"),
       'child_birth_date' => E::ts("Child's Birth Date"),
-      'child_gender' => E::ts("Gender of Child with ASD?"),
+      'child_gender' => E::ts("Child with ASD Identifies as"),
       'child_is_registered' => E::ts("Is your child registered with the Ontario Autism Program?"),
     ];
     for ($rowNumber = 1; $rowNumber <= 6; $rowNumber++) {
